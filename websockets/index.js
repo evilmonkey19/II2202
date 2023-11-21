@@ -1,77 +1,29 @@
-import express from 'express';
-import { ApolloServer, gql } from 'apollo-server-express';
-import { Server } from 'socket.io';
-import { createServer } from 'http';
+import express from 'express'
+import { Server } from "socket.io"
+import path from 'path'
+import { fileURLToPath } from 'url'
 
-const app = express();
-const httpServer = createServer(app);
-const io = new Server(httpServer, {
-  cors: {
-    origin: process.env.NODE_ENV === 'production' ? false : ['http://localhost:5500', 'http://127.0.0.1:5500'],
-  },
-});
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
-// Serve static files (e.g., HTML, CSS, and JS)
-app.use(express.static('public'));
+const PORT = process.env.PORT || 3500
 
-// GraphQL schema
-const typeDefs = gql`
-  type Query {
-    messages: [String]
-  }
+const app = express()
 
-  type Mutation {
-    addMessage(message: String): [String]
-  }
+app.use(express.static(path.join(__dirname, "public")))
 
-  type Subscription {
-    messageAdded: String
-  }
-`;
+const expressServer = app.listen(PORT, () => {
+    console.log(`listening on port ${PORT}`)
+    console.log(`Connect to http://localhost:${PORT}`)
+})
 
-const messages = [];
+const io = new Server(expressServer)
 
-const resolvers = {
-  Query: {
-    messages: () => messages,
-  },
-  Mutation: {
-    addMessage: (_, { message }) => {
-      messages.push(message);
-      io.emit('messageAdded', `${message}`);
-      return messages;
-    },
-  },
-  Subscription: {
-    messageAdded: {
-      subscribe: () => io.asyncIterator(['messageAdded']),
-    },
-  },
-};
+io.on('connection', socket => {
+    console.log(`User ${socket.id} connected`)
 
-const apolloServer = new ApolloServer({
-  typeDefs,
-  resolvers,
-});
-
-async function startApolloServer() {
-  await apolloServer.start();
-  apolloServer.applyMiddleware({ app });
-}
-
-startApolloServer();
-
-const PORT = process.env.PORT || 3500;
-
-httpServer.listen(PORT, () => {
-  console.log(`Server listening on http://localhost:${PORT}${apolloServer.graphqlPath}`);
-});
-
-io.on('connection', (socket) => {
-  console.log(`User ${socket.id} connected`);
-
-  socket.on('message', (data) => {
-    console.log(data);
-    io.emit('messageAdded', `${socket.id.substring(0, 5)}: ${data}`);
-  });
-});
+    socket.on('message', data => {
+        console.log(data)
+        io.emit('message', `${socket.id.substring(0, 5)}: ${data}`)
+    })
+})
