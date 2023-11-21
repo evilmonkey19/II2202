@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GraphQL</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Include the Apollo Client library -->
+    <script src="https://cdn.jsdelivr.net/npm/@apollo/client@3.5.1/dist/bundle.umd.min.js"></script>
+    <!-- Include the WebSocket library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.min.js" integrity="sha512-Xm9qbB6Pu06k3PUwPj785dyTl6oHxgsv9nHp7ej7nCpAqGZT3OZpsELuCYX05DdonFpTlBpXMOxjavIAIUwr0w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Include your app.js file -->
+    <script defer src="app.js"></script>
+</head>
+<body>
+    <form id="messageForm">
+        <input type="text" id="messageInput" placeholder="Your message">
+        <button type="submit">Send</button>
+    </form>
+    <ul id="messageList"></ul>
+</body>
+</html>
