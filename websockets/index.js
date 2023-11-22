@@ -1,6 +1,6 @@
-import express from 'express'
-import { Server } from "socket.io"
-import path from 'path'
+import { WebSocketServer } from 'ws'
+import express from "express"
+import path from "path"
 import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -12,18 +12,25 @@ const app = express()
 
 app.use(express.static(path.join(__dirname, "public")))
 
-const expressServer = app.listen(PORT, () => {
+const httpServer = app.listen(PORT, () => {
     console.log(`listening on port ${PORT}`)
     console.log(`Connect to http://localhost:${PORT}`)
 })
 
-const io = new Server(expressServer)
+const wsServer = new WebSocketServer({ port: 3549 });
 
-io.on('connection', socket => {
-    console.log(`User ${socket.id} connected`)
+wsServer.on("connection", function connection(ws) {
+    ws.on('error', console.error);
 
-    socket.on('message', data => {
-        console.log(data)
-        io.emit('message', `${socket.id.substring(0, 5)}: ${data}`)
-    })
+    ws.on('message', function message(data) {
+        console.log(`received: ${data} : ${new Date().toISOString()}`);
+    });
 })
+
+httpServer.on('upgrade', async function upgrade(request, socket, head) {
+    wsServer.handleUpgrade(request, socket, head, function done(ws) {
+        wsServer.emit('conection', ws, request);
+    });
+});
+
+// https://dev.to/codesphere/getting-started-with-web-sockets-in-nodejs-49n0

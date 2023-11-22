@@ -1,21 +1,32 @@
-const socket = io('ws://localhost:3500')
+const url = "ws://localhost:3549/myWebsocket"
+const mywsServer = new WebSocket(url)
 
-function sendMessage(e) {
-    e.preventDefault()
-    const input = document.querySelector('input')
-    if (input.value) {
-        socket.emit('message', input.value)
-        input.value = ""
-    }
-    input.focus()
+const myMessages = document.getElementById("messages")
+const myInput = document.getElementById("message")
+const sendBtn = document.getElementById("send")
+
+
+sendBtn.disabled = true
+sendBtn.addEventListener("click", sendMsg, false)
+
+function sendMsg() {
+    const text = myInput.value
+    myInput.value = ""
+    msgGeneration(text, "Client")
+    mywsServer.send(text)
 }
 
-document.querySelector('form')
-    .addEventListener('submit', sendMessage)
+function msgGeneration(msg, from) {
+    const newMessage = document.createElement("li")
+    newMessage.innerText = `${from} says: ${msg}`
+    myMessages.appendChild(newMessage)
+}
 
-// Listen for messages 
-socket.on("message", (data) => {
-    const li = document.createElement('li')
-    li.textContent = data
-    document.querySelector('ul').appendChild(li)
-})
+mywsServer.onopen = function() {
+    sendBtn.disabled = false
+}
+
+mywsServer.onmessage = function(event) {
+    const { data } = event
+    msgGeneration(data, "Server")
+}
