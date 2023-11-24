@@ -9,6 +9,7 @@ import { createServer } from "http"
 import express from 'express'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import fs from 'fs'
 
 // General
 const app = express();
@@ -36,25 +37,29 @@ type Message {
    name: String!
    content: String
 }`;
-
-let messages = []
+let messages = [];
+let close = 0;
 const resolvers = {
   Query: {
-     viewMessages() {
-        return messages;
-     },
+     viewMessages() {},
   },
   Mutation: {
       sendMessage: (parent, { name, content }) => {
+        try{
           const id = messages.length;
-          var new_message = {
-              id,
-              name,
-              content
+          pubsub.publish("MessageService", {receiveMessage:  { id, name, content }});
+          close = content === 'close' ? 1 : 0;
+          if (!close) {
+            messages.push(`${content}, ${new Date().toISOString()}`);
           }
-          messages.push(new_message);
-          pubsub.publish("MessageService", {receiveMessage:  new_message});
-          return new_message;
+          return { id , name, content };
+        } finally {
+          if (close) {
+            setTimeout(() => {
+              process.emit('SIGINT');
+            }, 1000);
+          }
+        }
       },
   },
   Subscription: {
@@ -78,4 +83,23 @@ app.use(express.static(path.join(__dirname, "public")))
 httpServer.listen(PORT, () => {
   console.log(`Query endpoint ready at http://localhost:${PORT}${server.graphqlPath}`);
   console.log(`Subscription endpoint ready at ws://localhost:${PORT}${server.graphqlPath}`);
+});
+
+function getNextFileName(baseDir, baseName, extension) {
+  let counter = 1;
+  while (true) {
+      const fileName = `${baseDir}/${baseName}_${counter}.${extension}`;
+      if (!fs.existsSync(fileName)) {
+          return fileName;
+      }
+      counter++;
+  }
+}
+
+process.on('SIGINT', function () {
+  console.log("Closing server, come tomorrow!");
+  const csvContent = messages.join('\n');
+  const fileName = getNextFileName('../results/graphql/servers', 'messages', 'csv');
+  fs.writeFileSync(fileName, csvContent);
+  process.exit();
 });

@@ -12,3 +12,6 @@ There are two main folders in this project:
 - `graphql`: Contains the code for the GraphQL application.
 
 Both applications are compared using different metrics provided by K6S. The results are stored in the `results` folder.
+
+The architecture in both cases it is described in the following figure:
+![Architecture](./docs/architecture.png)
