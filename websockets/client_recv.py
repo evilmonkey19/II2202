@@ -28,7 +28,7 @@ def run_instance(instance_name: str, n: int):
         current_time = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec='milliseconds')
         timings.append(f'{value.decode("utf-8")},{current_time}')
     ws.close()
-    with open(f"../results/websockets/clients/{n}/recv_timings_{instance_name}.csv", "w") as f:
+    with open(f"../results/websockets/clients/{n}/client_recv_{instance_name}.csv", "w") as f:
         f.write("\n".join(timings))
     
 

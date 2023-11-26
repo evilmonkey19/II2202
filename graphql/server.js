@@ -99,7 +99,7 @@ function getNextFileName(baseDir, baseName, extension) {
 process.on('SIGINT', function () {
   console.log("Closing server, come tomorrow!");
   const csvContent = messages.join('\n');
-  const fileName = getNextFileName('../results/graphql/servers', 'messages', 'csv');
+  const fileName = getNextFileName('../results/graphql/servers', 'server', 'csv');
   fs.writeFileSync(fileName, csvContent);
   process.exit();
 });
