@@ -52,8 +52,8 @@ if __name__ == "__main__":
     experiment_numbers = list(range(1, 11))
 
     # Calculate averages
-    average_times_graphql = [sum(diff) / len(diff) for diff in graphql_diff_sender_receiver]
-    average_times_websockets = [sum(diff) / len(diff) for diff in websockets_diff_sender_receiver]
+    average_times_graphql = [sum(diff) / len(diff) * 1000 for diff in graphql_diff_sender_receiver]
+    average_times_websockets = [sum(diff) / len(diff) * 1000 for diff in websockets_diff_sender_receiver]
 
     # Plot GraphQL averages
     plt.plot(experiment_numbers, average_times_graphql, label='GraphQL')
@@ -63,8 +63,10 @@ if __name__ == "__main__":
 
     # Add labels and title
     plt.xlabel('Number of Receivers')
-    plt.ylabel('Average Time')
+    plt.ylabel('Average Time [ms]')
     plt.title('Average Time from Sender to Receiver')
+
+    # Make the y-axis be in milliseconds
 
     # Add legend
     plt.legend()
@@ -80,12 +82,12 @@ if __name__ == "__main__":
 
     # Plotting the standard deviation of each experiment
     experiment_numbers = list(range(1, 11))
-    standard_deviations_grapql = [np.std(diff) for diff in graphql_diff_sender_receiver]
-    standard_deviations_websockets = [np.std(diff) for diff in websockets_diff_sender_receiver]
+    standard_deviations_grapql = [np.std(diff) * 1000 for diff in graphql_diff_sender_receiver]
+    standard_deviations_websockets = [np.std(diff) * 1000 for diff in websockets_diff_sender_receiver]
     plt.plot(experiment_numbers, standard_deviations_grapql, label='GraphQL')
     plt.plot(experiment_numbers, standard_deviations_websockets, label='Websockets')
     plt.xlabel('Number of Receivers')
-    plt.ylabel('Standard Deviation')
+    plt.ylabel('Standard Deviation [ms]')
     plt.title('Standard Deviation from Sender to Receiver')
     plt.legend()
     # plt.show()
@@ -107,8 +109,8 @@ if __name__ == "__main__":
     experiment_numbers = list(range(1, 11))
 
     # Calculate averages
-    average_times_graphql = [sum(diff) / len(diff) for diff in graphql_diff_server_receiver]
-    average_times_websockets = [sum(diff) / len(diff) for diff in websockets_diff_server_receiver]
+    average_times_graphql = [sum(diff) / len(diff) * 1_000 for diff in graphql_diff_server_receiver]
+    average_times_websockets = [sum(diff) / len(diff) * 1_000 for diff in websockets_diff_server_receiver]
 
     # Plot GraphQL averages
     plt.plot(experiment_numbers, average_times_graphql, label='GraphQL')
@@ -118,9 +120,8 @@ if __name__ == "__main__":
 
     # Add labels and title
     plt.xlabel('Number of Receivers')
-    plt.ylabel('Average Time')
+    plt.ylabel('Average Time [ms]')
     plt.title('Average Time from Server to Receiver')
-
     # Add legend
     plt.legend()
 
@@ -134,12 +135,12 @@ if __name__ == "__main__":
 
     # Plotting the standard deviation of each experiment
     experiment_numbers = list(range(1, 11))
-    standard_deviations_grapql = [np.std(diff) for diff in graphql_diff_server_receiver]
-    standard_deviations_websockets = [np.std(diff) for diff in websockets_diff_server_receiver]
+    standard_deviations_grapql = [np.std(diff) * 1_000 for diff in graphql_diff_server_receiver]
+    standard_deviations_websockets = [np.std(diff) * 1_000 for diff in websockets_diff_server_receiver]
     plt.plot(experiment_numbers, standard_deviations_grapql, label='GraphQL')
     plt.plot(experiment_numbers, standard_deviations_websockets, label='Websockets')
     plt.xlabel('Number of Receivers')
-    plt.ylabel('Standard Deviation')
+    plt.ylabel('Standard Deviation [ms]')
     plt.title('Standard Deviation from Server to Receiver')
     plt.legend()
     # plt.show()
